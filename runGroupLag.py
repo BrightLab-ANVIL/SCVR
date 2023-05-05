@@ -31,5 +31,5 @@ groupmask=os.path.join(basedir, "grpLevel/RANDOMISE_noDelay/group_mask.nii.gz")
 
 out=os.path.join(basedir, "grpLevel/")
 # out=os.path.join(basedir, "grpLevel")
-# groupLag.getBestFits(out,minus2,minus1,noDelay,plus1,plus2,plus3,plus4,plus5,maskpath=groupmask)
-grouplag.getBestFits(out,minus2,minus1,noDelay,plus1,plus2,plus3,plus4,plus5) 
+grouplag.getBestFits(out,minus2,minus1,noDelay,plus1,plus2,plus3,plus4,plus5,maskpath=groupmask)
+# grouplag.getBestFits(out,minus2,minus1,noDelay,plus1,plus2,plus3,plus4,plus5) 

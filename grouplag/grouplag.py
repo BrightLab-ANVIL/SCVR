@@ -11,7 +11,7 @@ class LagBH:
       self.img=self.loadData()
 
   def loadData(self):
-    # ARGUMENTS:    
+    # ARGUMENTS:
     # Load tstat nifti file
     # Adds back to self
     imgFile=nib.load(self.path)
@@ -26,6 +26,9 @@ def getBestFits(outdir,*tstatmap,**maskpath):
   
   # USAGE: 
   # getBestFits('path/to/output/directory',LagBH1,LagBH2,...,maskpath='group/mask/path')
+
+  # Note: Right now any lag value that =0 is set to a really small number 
+  # (for visualization purposes) 0.00000000000001
   
   # Load "template" image for nifti output & header info
   template=nib.load(tstatmap[0].path)
@@ -58,7 +61,7 @@ def getBestFits(outdir,*tstatmap,**maskpath):
 
   # LAG MAP: Find across the 4th dimension (of non-zero voxels)
   lagMap=np.zeros((template_shape[0], template_shape[1], template_shape[2]))
-  # indices of nonzero voxels (in mask or in tstat file):
+  # Use indices of nonzero voxels (in mask or in tstat file):
   if maskpath: 
     # If maskpath was given, find nonzero in group mask
     mask=nib.load(maskpath["maskpath"])
@@ -74,6 +77,8 @@ def getBestFits(outdir,*tstatmap,**maskpath):
     # print(np.argmax(allMaps[x,y,z,:], axis=0)) # max t-stat idx
     maxTstatIdx_temp=np.argmax(allMaps[x,y,z,:], axis=0)
     lag_temp=tstatmap[maxTstatIdx_temp].lagNum
+    if lag_temp==0:
+      lag_temp=0.00000000000001
     lagMap[x,y,z]=lag_temp
   
   orig=nib.load(tstatmap[0].path)
