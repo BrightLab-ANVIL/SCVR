@@ -3,6 +3,7 @@
 import os
 import numpy as np
 import nibabel as nib
+import warnings
 
 class LagBH:
   def __init__(self, lag, tstatpath):
@@ -12,13 +13,13 @@ class LagBH:
 
   def loadData(self):
     # ARGUMENTS:
-    # Load tstat nifti file
+    # Load nifti file
     # Adds back to self
     imgFile=nib.load(self.path)
     img=imgFile.get_fdata()
     return img
 
-def getBestFits(outdir,*tstatmap,**maskpath):
+def getBestFits(outdir,*tstatmap,maskpath=None):
   # ARGUMENTS:
   # outdir: 'path/to/output/directory'
   # *tstatmap: LagBH objects (wording?)
@@ -64,7 +65,7 @@ def getBestFits(outdir,*tstatmap,**maskpath):
   # Use indices of nonzero voxels (in mask or in tstat file):
   if maskpath: 
     # If maskpath was given, find nonzero in group mask
-    mask=nib.load(maskpath["maskpath"])
+    mask=nib.load(maskpath)
     maskimg=mask.get_fdata()
     specified=maskimg.nonzero()
   else:
@@ -89,6 +90,87 @@ def getBestFits(outdir,*tstatmap,**maskpath):
   print("View lag map:")
   print("fsleyes ",outpath_lag,"&")
 
+
+
+def lagCorrectedSCVR(outdir,*betamap,maskpath=None,lagmappath=None):
+  # Create lag corrected SCVR map with best fits 
+  # Requires running getBestFits() first
+  # ARGUMENTS:
+  # outdir: 'path/to/output/directory'
+  # *betamaps: LagBH objects
+  # lagmappath='path/to/lagMap.nii.gz'
+  # (optional) maskpath='path/to/groupmask.nii.gz'
+  # 
+  # USAGE: 
+  # lagCorrectedSCVR('path/to/output/directory',LagBH1,LagBH2,...,
+  # lagmappath='path/to/lagMap.nii.gz',maskpath='group/mask/path')
+
+  # Load "template" image for nifti output & header info
+  template=nib.load(betamap[0].path)
+  template_shape=template.header.get_data_shape()
+
+  # Get number of input beta maps
+  numData=len(betamap)
+
+  # Check that range of values in lag map does not exceed # beta maps
+  lagmap=nib.load(lagmappath)
+  lagmap_img=lagmap.get_fdata()
+  lagmap_range=np.ptp(lagmap_img)
+  if lagmap_range>numData:
+    warnings.warn("Lag map range exceeds number of input beta maps")
+
+
+  # Create 4D array of zeros – size of nifti and 4th dimension: numData
+  allMaps=np.zeros((template_shape[0], template_shape[1], template_shape[2], numData))
+  # Then fill this with the maps (or maybe just append them all to each other)
+  mapNum=0
+  indexRef={}
+  for map in betamap:
+    print("Lag:", map.lagNum, "TRs")
+    # Compile all beta maps into allMaps
+    allMaps[:,:,:,mapNum]=map.img
+    
+    # Create dictionary to index this
+    # map.lagNum ––– 0, 1, etc.
+    indexRef[map.lagNum] = mapNum
+    mapNum+=1
+  print("INDEX REFS:")
+  print(indexRef)
+
+  # Print nifti file of all pe/beta maps
+  allMapsNii=nib.Nifti1Image(allMaps, template.affine, template.header)
+  outpath=os.path.join(outdir,"peMapsAll.nii.gz")
+  nib.save(allMapsNii, outpath)
+
+  # LAG CORR MAP: Find across the 4th dimension (of non-zero voxels)
+  corrSCVR=np.zeros((template_shape[0], template_shape[1], template_shape[2]))
+
+  # Use indices of nonzero voxels (in mask or in beta file):
+  if maskpath: 
+    # If maskpath was given, find nonzero in group mask
+    mask=nib.load(maskpath)
+    maskimg=mask.get_fdata()
+    specified=maskimg.nonzero()
+  else:
+    # If maskpath was not given, find nonzero in first beta map
+    specified=allMaps[:,:,:,0].nonzero()
+
+  for (x,y,z) in zip(*specified):
+    # Get lag at each voxel location
+    voxelLag=int(lagmap_img[x,y,z])
+
+    # Fill corrected SCVR map with the appropriate beta parameter
+    # (using indexRef dictionary)
+    corrSCVR[x,y,z]=allMaps[x,y,z,indexRef[voxelLag]]
+
+  # Save nifti
+  orig=nib.load(betamap[0].path)
+  corrSCVRNii=nib.Nifti1Image(corrSCVR, orig.affine, orig.header)
+  outpath_SCVR=os.path.join(outdir,"lagCorrSCVR.nii.gz")
+  nib.save(corrSCVRNii, outpath_SCVR)
+  
+  print("View lag map:")
+  print("fsleyes ",outpath_SCVR,"&")
 
 """
 Written by Kimberly J. Hemmerling 2023
