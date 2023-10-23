@@ -92,9 +92,14 @@ def getBestFits(outdir,*tstatmap,maskpath=None):
 
 
 
-def lagCorrectedSCVR(outdir,*betamap,maskpath=None,lagmappath=None):
+def lagCorrectedSCVR(outdir,*betamap,maskpath=None,lagmappath=None,
+                     prefix=None):
   # Create lag corrected SCVR map with best fits 
   # Requires running getBestFits() first
+  # THIS IS OPTION 1: use the lag map output and the parameter estimates 
+  # in each randomise delay folder to construct a lag-corrected SCVR 
+  # output file.
+  # 
   # ARGUMENTS:
   # outdir: 'path/to/output/directory'
   # *betamaps: LagBH objects
@@ -139,7 +144,10 @@ def lagCorrectedSCVR(outdir,*betamap,maskpath=None,lagmappath=None):
 
   # Print nifti file of all pe/beta maps
   allMapsNii=nib.Nifti1Image(allMaps, template.affine, template.header)
-  outpath=os.path.join(outdir,"peMapsAll.nii.gz")
+  if prefix==None:
+    outpath=os.path.join(outdir,"peMapsAll.nii.gz")
+  else:
+    outpath=os.path.join(outdir,prefix+"_peMapsAll.nii.gz")
   nib.save(allMapsNii, outpath)
 
   # LAG CORR MAP: Find across the 4th dimension (of non-zero voxels)
@@ -166,11 +174,25 @@ def lagCorrectedSCVR(outdir,*betamap,maskpath=None,lagmappath=None):
   # Save nifti
   orig=nib.load(betamap[0].path)
   corrSCVRNii=nib.Nifti1Image(corrSCVR, orig.affine, orig.header)
-  outpath_SCVR=os.path.join(outdir,"lagCorrSCVR.nii.gz")
+  if prefix==None:
+    outpath_SCVR=os.path.join(outdir,"lagCorrSCVR.nii.gz")
+  else:
+    outpath_SCVR=os.path.join(outdir,prefix+"_lagCorrSCVR.nii.gz")
   nib.save(corrSCVRNii, outpath_SCVR)
   
   print("View lag map:")
   print("fsleyes ",outpath_SCVR,"&")
+
+def lagCorrectedSCVR_2(outdir,*betamap,maskpath=None,lagmappath=None):
+  # Create lag corrected SCVR map with best fits 
+  # Requires running getBestFits() first
+  # THIS IS OPTION 2: use the lag map output to create lag-corrected 
+  # first-level model output maps (subject-level, or run-level). These can
+  # then be combined into a 4D file and input into randomise (?)
+
+  # ACTUALLY can I just apply the above function to run-level beta parameter maps
+  # instead??? (I think I can!!)
+  print("")
 
 """
 Written by Kimberly J. Hemmerling 2023
