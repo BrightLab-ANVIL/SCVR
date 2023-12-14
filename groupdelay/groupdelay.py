@@ -5,9 +5,9 @@ import numpy as np
 import nibabel as nib
 import warnings
 
-class LagBH:
-  def __init__(self, lag, tstatpath):
-      self.lagNum = lag
+class DelayBH:
+  def __init__(self, delay, tstatpath):
+      self.delayNum = delay
       self.path = tstatpath
       self.img=self.loadData()
 
@@ -22,13 +22,13 @@ class LagBH:
 def getBestFits(outdir,*tstatmap,maskpath=None):
   # ARGUMENTS:
   # outdir: 'path/to/output/directory'
-  # *tstatmap: LagBH objects (wording?)
+  # *tstatmap: DelayBH objects (wording?)
   # (optional) maskpath='path/to/groupmask.nii.gz'
   
   # USAGE: 
-  # getBestFits('path/to/output/directory',LagBH1,LagBH2,...,maskpath='group/mask/path')
+  # getBestFits('path/to/output/directory',DelayBH1,DelayBH2,...,maskpath='group/mask/path')
 
-  # Note: Right now any lag value that =0 is set to a really small number 
+  # Note: Right now any delay value that =0 is set to a really small number 
   # (for visualization purposes) 0.00000000000001
   
   # Load "template" image for nifti output & header info
@@ -45,7 +45,7 @@ def getBestFits(outdir,*tstatmap,maskpath=None):
   # Then fill this with the maps (or maybe just append them all to each other)
   mapNum=0
   for map in tstatmap:
-    print("Lag:", map.lagNum,"TRs")
+    print("Delay:", map.delayNum,"TRs")
     # allMaps=np.append(allMaps,map)
     allMaps[:,:,:,mapNum]=map.img
     mapNum+=1  
@@ -60,8 +60,8 @@ def getBestFits(outdir,*tstatmap,maskpath=None):
   outpath=os.path.join(outdir,"tstatMapsAll.nii.gz")
   nib.save(allMapsNii, outpath)
 
-  # LAG MAP: Find across the 4th dimension (of non-zero voxels)
-  lagMap=np.zeros((template_shape[0], template_shape[1], template_shape[2]))
+  # DELAY MAP: Find across the 4th dimension (of non-zero voxels)
+  delayMap=np.zeros((template_shape[0], template_shape[1], template_shape[2]))
   # Use indices of nonzero voxels (in mask or in tstat file):
   if maskpath: 
     # If maskpath was given, find nonzero in group mask
@@ -77,38 +77,38 @@ def getBestFits(outdir,*tstatmap,maskpath=None):
     # print(np.amax(allMaps[x,y,z,:], axis=0)) # max t-stat
     # print(np.argmax(allMaps[x,y,z,:], axis=0)) # max t-stat idx
     maxTstatIdx_temp=np.argmax(allMaps[x,y,z,:], axis=0)
-    lag_temp=tstatmap[maxTstatIdx_temp].lagNum
-    if lag_temp==0:
-      lag_temp=0.00000000000001
-    lagMap[x,y,z]=lag_temp
+    delay_temp=tstatmap[maxTstatIdx_temp].delayNum
+    if delay_temp==0:
+      delay_temp=0.00000000000001
+    delayMap[x,y,z]=delay_temp
   
   orig=nib.load(tstatmap[0].path)
-  lagMapNii=nib.Nifti1Image(lagMap, orig.affine, orig.header)
-  outpath_lag=os.path.join(outdir,"lagMap.nii.gz")
-  nib.save(lagMapNii, outpath_lag)
+  delayMapNii=nib.Nifti1Image(delayMap, orig.affine, orig.header)
+  outpath_delay=os.path.join(outdir,"delayMap.nii.gz")
+  nib.save(delayMapNii, outpath_delay)
   
-  print("View lag map:")
-  print("fsleyes ",outpath_lag,"&")
+  print("View delay map:")
+  print("fsleyes ",outpath_delay,"&")
 
 
 
-def lagCorrectedSCVR(outdir,*betamap,maskpath=None,lagmappath=None,
+def delayCorrectedSCVR(outdir,*betamap,maskpath=None,delaymappath=None,
                      prefix=None):
-  # Create lag corrected SCVR map with best fits 
+  # Create delay corrected SCVR map with best fits 
   # Requires running getBestFits() first
-  # THIS IS OPTION 1: use the lag map output and the parameter estimates 
-  # in each randomise delay folder to construct a lag-corrected SCVR 
-  # output file.
+  # THIS IS OPTION 1: use the delay map output and the parameter estimates 
+  # in each randomise delay folder to construct a delay-corrected SCVR 
+  # output file (for each fMRI run).
   # 
   # ARGUMENTS:
   # outdir: 'path/to/output/directory'
-  # *betamaps: LagBH objects
-  # lagmappath='path/to/lagMap.nii.gz'
+  # *betamaps: DelayBH objects
+  # delaymappath='path/to/delayMap.nii.gz'
   # (optional) maskpath='path/to/groupmask.nii.gz'
   # 
   # USAGE: 
-  # lagCorrectedSCVR('path/to/output/directory',LagBH1,LagBH2,...,
-  # lagmappath='path/to/lagMap.nii.gz',maskpath='group/mask/path')
+  # delayCorrectedSCVR('path/to/output/directory',DelayBH1,DelayBH2,...,
+  # delaymappath='path/to/delayMap.nii.gz',maskpath='group/mask/path')
 
   # Load "template" image for nifti output & header info
   template=nib.load(betamap[0].path)
@@ -117,12 +117,12 @@ def lagCorrectedSCVR(outdir,*betamap,maskpath=None,lagmappath=None,
   # Get number of input beta maps
   numData=len(betamap)
 
-  # Check that range of values in lag map does not exceed # beta maps
-  lagmap=nib.load(lagmappath)
-  lagmap_img=lagmap.get_fdata()
-  lagmap_range=np.ptp(lagmap_img)
-  if lagmap_range>numData:
-    warnings.warn("Lag map range exceeds number of input beta maps")
+  # Check that range of values in delay map does not exceed # beta maps
+  delaymap=nib.load(delaymappath)
+  delaymap_img=delaymap.get_fdata()
+  delaymap_range=np.ptp(delaymap_img)
+  if delaymap_range>numData:
+    warnings.warn("Delay map range exceeds number of input beta maps")
 
 
   # Create 4D array of zeros – size of nifti and 4th dimension: numData
@@ -131,13 +131,13 @@ def lagCorrectedSCVR(outdir,*betamap,maskpath=None,lagmappath=None,
   mapNum=0
   indexRef={}
   for map in betamap:
-    print("Lag:", map.lagNum, "TRs")
+    print("Delay:", map.delayNum, "TRs")
     # Compile all beta maps into allMaps
     allMaps[:,:,:,mapNum]=map.img
     
     # Create dictionary to index this
-    # map.lagNum ––– 0, 1, etc.
-    indexRef[map.lagNum] = mapNum
+    # map.delayNum ––– 0, 1, etc.
+    indexRef[map.delayNum] = mapNum
     mapNum+=1
   print("INDEX REFS:")
   print(indexRef)
@@ -150,7 +150,7 @@ def lagCorrectedSCVR(outdir,*betamap,maskpath=None,lagmappath=None,
     outpath=os.path.join(outdir,prefix+"_peMapsAll.nii.gz")
   nib.save(allMapsNii, outpath)
 
-  # LAG CORR MAP: Find across the 4th dimension (of non-zero voxels)
+  # DELAY CORR MAP: Find across the 4th dimension (of non-zero voxels)
   corrSCVR=np.zeros((template_shape[0], template_shape[1], template_shape[2]))
 
   # Use indices of nonzero voxels (in mask or in beta file):
@@ -164,29 +164,29 @@ def lagCorrectedSCVR(outdir,*betamap,maskpath=None,lagmappath=None,
     specified=allMaps[:,:,:,0].nonzero()
 
   for (x,y,z) in zip(*specified):
-    # Get lag at each voxel location
-    voxelLag=int(lagmap_img[x,y,z])
+    # Get delay at each voxel location
+    voxelDelay=int(delaymap_img[x,y,z])
 
     # Fill corrected SCVR map with the appropriate beta parameter
     # (using indexRef dictionary)
-    corrSCVR[x,y,z]=allMaps[x,y,z,indexRef[voxelLag]]
+    corrSCVR[x,y,z]=allMaps[x,y,z,indexRef[voxelDelay]]
 
   # Save nifti
   orig=nib.load(betamap[0].path)
   corrSCVRNii=nib.Nifti1Image(corrSCVR, orig.affine, orig.header)
   if prefix==None:
-    outpath_SCVR=os.path.join(outdir,"lagCorrSCVR.nii.gz")
+    outpath_SCVR=os.path.join(outdir,"delayCorrSCVR.nii.gz")
   else:
-    outpath_SCVR=os.path.join(outdir,prefix+"_lagCorrSCVR.nii.gz")
+    outpath_SCVR=os.path.join(outdir,prefix+"_delayCorrSCVR.nii.gz")
   nib.save(corrSCVRNii, outpath_SCVR)
   
-  print("View lag map:")
+  print("View delay map:")
   print("fsleyes ",outpath_SCVR,"&")
 
-def lagCorrectedSCVR_2(outdir,*betamap,maskpath=None,lagmappath=None):
-  # Create lag corrected SCVR map with best fits 
+def delayCorrectedSCVR_2(outdir,*betamap,maskpath=None,delaymappath=None):
+  # Create delay corrected SCVR map with best fits 
   # Requires running getBestFits() first
-  # THIS IS OPTION 2: use the lag map output to create lag-corrected 
+  # THIS IS OPTION 2: use the delay map output to create delay-corrected 
   # first-level model output maps (subject-level, or run-level). These can
   # then be combined into a 4D file and input into randomise (?)
 

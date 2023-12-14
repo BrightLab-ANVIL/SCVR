@@ -5,7 +5,7 @@ import numpy as np
 import csv
 from phys2cvr.phys2cvr import phys2cvr
 
-def lagRegressor(
+def delayRegressor(
         TR,
         fname,
         increment=0.3,
@@ -13,11 +13,11 @@ def lagRegressor(
         ):
     """
     **** NOT USING THIS ****
-    Create .txt files of lagged regressors with .txt file regressor input.
+    Create .txt files of delayed regressors with .txt file regressor input.
     ARGUMENTS:
     TR : TR (in seconds)
     fname : file name, including full path to file (.txt)
-    increment : lag regressor shifts (in seconds) [default: 0.3]
+    increment : delay regressor shifts (in seconds) [default: 0.3]
     maxShift : maximum positive and negative shift of input regressor (in seconds) [default: 5]
     """
     # Load input regressor
@@ -59,7 +59,7 @@ def extractCO2(fname,col=1):
 
 # # Testing my code (taking a break on this...)
 # co2path='/Users/kjh6624/Desktop/C03/C03_S1_SC_BH/regressors/C03_S1_SC_BH_CO2_HRFconv.txt'
-# # lagRegressor(2,co2path,increment=0.3,maxShift=1)
+# # delayRegressor(2,co2path,increment=0.3,maxShift=1)
 
 # # Testing file
 # subj="C03"
@@ -88,8 +88,8 @@ for subj in range(1,31):
          outdir=[INSERT STUFF],
          run_conv=False,
          freq=float(100),
-         lag_max=10,
-         lag_step=0.3,
+         delay_max=10,
+         delay_step=0.3,
          run_regression=False,
          skip_xcorr=True
          )
@@ -102,8 +102,8 @@ for subj in range(1,31):
 #          fname_mask="/Users/kjh6624/Desktop/C03/C03_S1_SC_BH/C03_S1_SC_BH_mask1slice.nii.gz",
 #          outdir="/Users/kjh6624/Desktop/C03/C03_S1_SC_BH/phys2cvr_rawCO2",
 #          freq=float(100),
-#          lag_max=5,
-#          lag_step=0.3,
+#          delay_max=5,
+#          delay_step=0.3,
 #          run_regression=False,
 #          skip_xcorr=True
 #          )
@@ -114,19 +114,19 @@ for subj in range(1,31):
 #          outdir="/Users/kjh6624/Desktop/C03/C03_S1_SC_BH/phys2cvr_CO2convReg",
 #          run_conv=False,
 #          freq=float(100),
-#          lag_max=5,
-#          lag_step=0.25,
+#          delay_max=5,
+#          delay_step=0.25,
 #          run_regression=False,
 #          skip_xcorr=True
 #          )
 # Test 1 vs. test 2: regressors look basically exactly the same... test 2: easier to format text
 # file correctly for phys2cvr -> USE TEST 2
 
-# I could use the xcorr to get the opt lag for that dataset in 
-# the ROI I chose using createLagROI.sh
+# I could use the xcorr to get the opt delay for that dataset in 
+# the ROI I chose using createDelayROI.sh
 
 # NEXT TO DO: 
 # add ROI/bulk shift thing
 # how does the 195 vs 205 TRs thing play into the code (trim after??)
 # figure out what the regressor names mean wrt bulk shift
-# make lagged co2 regressors for all scans
+# make delayged co2 regressors for all scans
