@@ -2,6 +2,10 @@
 
 Scripts **Spinal Cord Vascular Reactivity** (SCVR) delay mapping. The main functions are contained in `groupdelay.py`. 
 
+---
+[![Twitter URL](https://img.shields.io/twitter/follow/KJHemm?style=social)](https://twitter.com/KJHemm)
+<br>
+
 ----
 ### How to Use:
 These scripts were designed to take outputs from higher-level/group-level modeling including:
