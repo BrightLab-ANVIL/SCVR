@@ -4,6 +4,7 @@ Scripts **Spinal Cord Vascular Reactivity** (SCVR) delay mapping. The main funct
 
 ---
 [![Twitter URL](https://img.shields.io/twitter/follow/KJHemm?style=social)](https://twitter.com/KJHemm)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/BrightLab-ANVIL/SCVR/blob/main/LICENSE)
 <br>
 
 ----
