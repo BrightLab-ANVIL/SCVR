@@ -19,13 +19,13 @@ Requires the _nibabel_ python package.
 
 **groupdelay.py**: a generic code file that defines functions used in the run files, and does not need specific editing.
 
-1. **runIndivDelay.py**: takes the t-statistic maps (from _randomise_) for each time shift and calculates a group delay map. Outputs:
-- delayMap.nii.gz: group average voxel-wise delay map.
-- tstatMapsAll.nii.gz: group average statistical map with all time shifts concatenated in the 4th dimension.
+1. **runIndivDelay.py**: takes the t-statistic maps (from _randomise_) for each time shift and calculates a delay map. Outputs:
+- delayMap.nii.gz: voxel-wise delay map based on tstats.
+- tstatMapsAll.nii.gz: tstat map for each time shift concatenated in the 4th dimension.
 
-2. **runIndivDelayCorr.py**: takes in the cope files (CVR maps) from each scan at each time shift and calculates a delay-corrected SCVR map for each scan. Outputs:
-- _delayCorrSCVR.nii.gz: scan delay-corrected SCVR map.
-- _peMapsAll.nii.gz: scan CVR map with all time shifts concatenated in the 4th dimension.
+2. **runIndivDelayCorr.py**: takes in the cope files (CVR maps) from each fMRI run at each time shift and calculates delay-corrected SCVR maps. Outputs:
+- _delayCorrSCVR.nii.gz: delay-corrected SCVR map for each fMRI run.
+- _peMapsAll.nii.gz: CVR maps with all time shifts concatenated in the 4th dimension, for each fMRI run.
 
 3. Run _randomise_ on scan-concatenated CVR maps.
 
