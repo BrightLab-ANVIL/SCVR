@@ -96,7 +96,7 @@ def delayCorrectedSCVR(outdir,*betamap,maskpath=None,delaymappath=None,
                      prefix=None):
   # Create delay corrected SCVR map with best fits 
   # Requires running getBestFits() first
-  # THIS IS OPTION 1: use the delay map output and the parameter estimates 
+  # Uses the delay map output and the parameter estimates 
   # in each randomise delay folder to construct a delay-corrected SCVR 
   # output file (for each fMRI run).
   # 
