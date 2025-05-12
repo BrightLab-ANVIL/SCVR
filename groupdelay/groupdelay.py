@@ -28,8 +28,8 @@ def getBestFits(outdir,*tstatmap,maskpath=None):
   # USAGE: 
   # getBestFits('path/to/output/directory',DelayBH1,DelayBH2,...,maskpath='group/mask/path')
 
-  # Note: Right now any delay value that =0 is set to a really small number 
-  # (for visualization purposes) 0.00000000000001
+  # Note: Right now any delay value that =0 is set to a really small number so that it 
+  # is distinct from the background (for visualization purposes) 0.00000000000001
   
   # Load "template" image for nifti output & header info
   template=nib.load(tstatmap[0].path)
@@ -105,10 +105,11 @@ def delayCorrectedSCVR(outdir,*betamap,maskpath=None,delaymappath=None,
   # *betamaps: DelayBH objects
   # delaymappath='path/to/delayMap.nii.gz'
   # (optional) maskpath='path/to/groupmask.nii.gz'
+  # (optional) prefix='sub-01_run-01'
   # 
   # USAGE: 
   # delayCorrectedSCVR('path/to/output/directory',DelayBH1,DelayBH2,...,
-  # delaymappath='path/to/delayMap.nii.gz',maskpath='group/mask/path')
+  # delaymappath='path/to/delayMap.nii.gz',maskpath='path/to/mask.nii.gz')
 
   # Load "template" image for nifti output & header info
   template=nib.load(betamap[0].path)
@@ -182,17 +183,6 @@ def delayCorrectedSCVR(outdir,*betamap,maskpath=None,delaymappath=None,
   
   print("View delay map:")
   print("fsleyes ",outpath_SCVR,"&")
-
-def delayCorrectedSCVR_2(outdir,*betamap,maskpath=None,delaymappath=None):
-  # Create delay corrected SCVR map with best fits 
-  # Requires running getBestFits() first
-  # THIS IS OPTION 2: use the delay map output to create delay-corrected 
-  # first-level model output maps (subject-level, or run-level). These can
-  # then be combined into a 4D file and input into randomise (?)
-
-  # ACTUALLY can I just apply the above function to run-level beta parameter maps
-  # instead??? (I think I can!!)
-  print("")
 
 """
 Written by Kimberly J. Hemmerling 2023
