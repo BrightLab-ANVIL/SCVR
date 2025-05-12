@@ -1,33 +1,35 @@
 import os
 from groupdelay import groupdelay
 
-subj="BH-03"
+# Run file to calculate individual delay map (e.g., for highly sampled subjects with multiple runs)
+
+subj="sub-01"
 print("subject: "+subj)
-prefix=subj+ "_combo-18"
-stat_file=subj + "_combo-18_tstat1.nii.gz"
-basedir="/Users/kjh6624/Documents/ANVIL/SPINAL_CORD/Neilsen/BreathHoldAnalysis/"
-plus1path=os.path.join(basedir,
-                       "grpLevel-BH18/RANDOMISE_blur_plus1/onesamp_t/", prefix, stat_file)
-plus2path=os.path.join(basedir,
-                       "grpLevel-BH18/RANDOMISE_blur_plus2/onesamp_t/", prefix, stat_file)
-plus3path=os.path.join(basedir,
-                       "grpLevel-BH18/RANDOMISE_blur_plus3/onesamp_t/", prefix, stat_file)
-plus4path=os.path.join(basedir,
-                       "grpLevel-BH18/RANDOMISE_blur_plus4/onesamp_t/", prefix, stat_file)
-plus5path=os.path.join(basedir,
-                       "grpLevel-BH18/RANDOMISE_blur_plus5/onesamp_t/", prefix, stat_file)
-noDelaypath=os.path.join(basedir,
-                         "grpLevel-BH18/RANDOMISE_blur_noDelay/onesamp_t/", prefix, stat_file)
-minus1path=os.path.join(basedir,
-                        "grpLevel-BH18/RANDOMISE_blur_minus1/onesamp_t/", prefix, stat_file)
-minus2path=os.path.join(basedir,
-                        "grpLevel-BH18/RANDOMISE_blur_minus2/onesamp_t/", prefix, stat_file)
-minus3path=os.path.join(basedir,
-                        "grpLevel-BH18/RANDOMISE_blur_minus3/onesamp_t/", prefix, stat_file)
-minus4path=os.path.join(basedir,
-                        "grpLevel-BH18/RANDOMISE_blur_minus4/onesamp_t/", prefix, stat_file)
+basedir="/path/to/base/directory/"
+# Define paths to statistic (e.g., t-stat) files
+stat_file="cope1_tstat1.nii.gz"
 minus5path=os.path.join(basedir,
-                        "grpLevel-BH18/RANDOMISE_blur_minus5/onesamp_t/", prefix, stat_file)
+                        "path/to/minus5/", stat_file)
+minus4path=os.path.join(basedir,
+                        "path/to/minus4/", stat_file)
+minus3path=os.path.join(basedir,
+                        "path/to/minus3/", stat_file)
+minus2path=os.path.join(basedir,
+                        "path/to/minus2/", stat_file)
+minus1path=os.path.join(basedir,
+                        "path/to/minus1/", stat_file)
+noDelaypath=os.path.join(basedir,
+                        "path/to/noDelay/", stat_file)
+plus1path=os.path.join(basedir,
+                       "path/to/plus1/", stat_file)
+plus2path=os.path.join(basedir,
+                       "path/to/plus2/", stat_file)
+plus3path=os.path.join(basedir,
+                       "path/to/plus3/", stat_file)
+plus4path=os.path.join(basedir,
+                       "path/to/plus4/", stat_file)
+plus5path=os.path.join(basedir,
+                       "path/to/plus5/", stat_file)
 minus5=groupdelay.DelayBH(-5,minus5path)
 minus4=groupdelay.DelayBH(-4,minus4path)
 minus3=groupdelay.DelayBH(-3,minus3path)
@@ -39,8 +41,10 @@ plus2=groupdelay.DelayBH(+2,plus2path)
 plus3=groupdelay.DelayBH(3,plus3path)
 plus4=groupdelay.DelayBH(4,plus4path)
 plus5=groupdelay.DelayBH(5,plus5path)
-groupmask=os.path.join(basedir, "grpLevel-BH18/RANDOMISE_blur_noDelay/group_mask.nii.gz")
-
-out=os.path.join(basedir, "grpLevel-BH18/", subj+"_delay",)
+# Define path to consensus mask
+groupmask=os.path.join(basedir, "path/to/group_mask.nii.gz")
+# Define path to output directory
+out=os.path.join(basedir, "path/to", "folder")
+# Calculate delay map
 groupdelay.getBestFits(out,minus5,minus4,minus3,minus2,minus1,noDelay,
                      plus1,plus2,plus3,plus4,plus5,maskpath=groupmask)
