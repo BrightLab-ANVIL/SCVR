@@ -60,4 +60,4 @@ This assumes that first-level and higher-level modeling were already performed a
 
 ----
 ### Citation: 
-Hemmerling KJ, Hoggarth MA, Sandhu MS, Parrish TB, Bright MG. MRI mapping of hemodynamics in the human spinal cord. _bioRxiv_ [Preprint]. 2024 Feb 27:2024.02.22.581606. doi: 10.1101/2024.02.22.581606.
+Hemmerling KJ, Hoggarth MA, Sandhu MS, Parrish TB, Bright MG. MRI mapping of hemodynamics in the human spinal cord. _Sci Rep_ 15, 34880 (2025). https://doi.org/10.1038/s41598-025-17048-4
